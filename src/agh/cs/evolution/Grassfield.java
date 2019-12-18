@@ -32,7 +32,6 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
         this.moveEnergy=(int)moveEnergy;
         this.plantEnergy=(int)plantEnergy;
         this.startEnergy=(int)startEnergy;
-        this.stats=new Statistic(animals);
         int i = 0;
         while(i<aniNum)
         {
@@ -46,6 +45,7 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
         {
             placeGrass();
         }
+        this.stats=new Statistic(animals);
 
     }
 
@@ -107,6 +107,7 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
             animal=animals.get(i);
             if(animals.get(i).getEnergy()<this.moveEnergy)
             {
+                animal.die();
                 animals.remove(animal);
                 all.remove(animal);
                 animal.removeObserver(mb);
@@ -287,7 +288,7 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
         return new Vector2d(posx, posy);
     }
 
-    public void exportStats () throws FileNotFoundException {
-        this.stats.export(animals.size(),grasses.size());
+    public void exportStats (String qua) throws FileNotFoundException {
+        this.stats.export(animals.size(),grasses.size(),qua);
     }
 }

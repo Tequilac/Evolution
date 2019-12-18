@@ -61,8 +61,14 @@ public class Animal
     {
         String info ="Descendants: "+ this.descendants.size()+ " Children: " + this.getChildren() + " Genome: ";
         for(int i = 0; i<32; i++)
-            info=info+this.genes.geneSet[i]+" ";
+            info=info+this.genes.geneSet[i];
+        if(this.energy==-1)
+            info=info+" Death day: "+this.age;
         return info;
+    }
+    public void die ()
+    {
+        this.energy=-1;
     }
     public void move(int moveEnergy)
     {

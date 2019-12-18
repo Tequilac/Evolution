@@ -10,15 +10,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class Frame extends JFrame
 {
     public Evolution evolution;
     public List <Grassfield> maps = new LinkedList<>();
     public List <Panel> panels = new LinkedList<>();
+    JPanel panel;
     public JLabel [] stats;
-    public boolean go = false;
+    String [] quantity = new String[2];
+    Thread thread;
 
     public Frame (Evolution evolution)
     {
@@ -49,6 +50,7 @@ public class Frame extends JFrame
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+                stat();
             }
         });
         button2.addActionListener(new ActionListener() {
@@ -66,13 +68,16 @@ public class Frame extends JFrame
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+                stat();
             }
         });
 
 
     }
 
-    public void oneMap () throws IOException, ParseException {
+    public void oneMap () throws IOException, ParseException
+    {
+        quantity[0]="";
         Grassfield map = this.evolution.getMap();
         this.maps.add(map);
         Panel panel = new Panel(map, getWidth()/2, getHeight());
@@ -80,7 +85,8 @@ public class Frame extends JFrame
         add(panel);
 
     }
-    public void twoMaps () throws IOException, ParseException {
+    public void twoMaps () throws IOException, ParseException
+    {
         Grassfield map1 = this.evolution.getMap();
         Panel panel1 = new Panel(map1, getWidth()/3, getHeight());
         Grassfield map2 = this.evolution.getMap();
@@ -91,11 +97,13 @@ public class Frame extends JFrame
         this.panels.add(panel2);
         add(panel1);
         add(panel2);
+        quantity[0]="Left ";
+        quantity[1]="Right ";
     }
-    public void side () {
-        JPanel panel = new JPanel();
+    public void side ()
+    {
+        panel = new JPanel();
         panel.setLayout(null);
-        //panel.setBounds(0,0,200,getHeight());
         panel.setPreferredSize(new Dimension(200, getHeight()));
         add(panel);
         JButton play = new JButton("Play");
@@ -110,40 +118,43 @@ public class Frame extends JFrame
         panel.add(domGen);
         export.setBounds(0,150,200, 50);
         panel.add(export);
+        Frame frame=this;
 
-        //stats = new JLabel[maps.size()*6];
 
 
         play.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                for(Grassfield map : maps)
-                    evolution.oneDay(map);
-                for(Panel panel : panels)
-                    panel.refresh();
+                thread=new AnotherThread(frame);
+                thread.start();
+
             }
         });
         stop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
+                thread.interrupt();
             }
         });
         domGen.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
+                for(Panel panel : panels)
+                    panel.highlight();
             }
         });
         export.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                for(Grassfield map : maps) {
+                int i=0;
+                for(Grassfield map : maps)
+                {
                     try {
-                        map.exportStats();
+                        map.exportStats(quantity[i]);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
+                    i++;
                 }
             }
         });
@@ -151,6 +162,27 @@ public class Frame extends JFrame
 
     }
 
+    public void stat ()
+    {
+        stats = new JLabel[maps.size()*7];
+        int i=0;
+        for(Grassfield map : maps)
+        {
+            stats[i*7]=new JLabel(quantity[i]+"Map statistics:");
+            stats[1+i*7]=new JLabel("Animals: "+map.animals.size());
+            stats[2+i*7]=new JLabel("Grasses: "+map.grasses.size());
+            stats[3+i*7]=new JLabel("Average energy: "+map.stats.averageEnergy);
+            stats[4+i*7]=new JLabel("Dominant gene: "+map.stats.dominatingGene);
+            stats[5+i*7]=new JLabel("Average age: "+map.stats.averageAge);
+            stats[6+i*7]=new JLabel("Average number of children: "+map.stats.averageChildren);
+            i++;
+        }
+        for(int j=0; j<maps.size()*7; j++)
+        {
+            panel.add(stats[j]);
+            stats[j].setBounds(0,200+j*20,200, 20);
+        }
+    }
 
 
 }

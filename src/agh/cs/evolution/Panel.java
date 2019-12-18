@@ -12,6 +12,7 @@ public class Panel extends JPanel
     JButton [][] buttons;
     JPanel world;
     JPanel statistics;
+    Animal aniFollow;
     public Panel (Grassfield map, int wid, int hei)
     {
         this.map=map;
@@ -52,13 +53,16 @@ public class Panel extends JPanel
             buttons[x][y].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    JLabel stats = new JLabel(animal.toString());
+                    aniFollow=animal;
+                    JLabel stats = new JLabel(aniFollow.toString());
                     statistics.removeAll();
                     statistics.add(stats);
                     updateUI();
                 }
             });
         }
+
+
     }
     public void refresh ()
     {
@@ -89,17 +93,40 @@ public class Panel extends JPanel
             buttons[x][y].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    JLabel stats = new JLabel(animal.toString());
+                    aniFollow=animal;
+                    JLabel stats = new JLabel(aniFollow.toString());
                     statistics.removeAll();
                     statistics.add(stats);
                     updateUI();
                 }
             });
         }
+        updateFollow();
+
     }
 
+    public void highlight ()
+    {
+        List<Animal> ani = map.animals;
+        for(Animal animal : ani)
+        {
+            int x = animal.getPosition().x;
+            int y = animal.getPosition().y;
+            buttons[x][y].setBackground(new Color(0,255,255));
 
-
+        }
+        updateUI();
+    }
+    public void updateFollow ()
+    {
+        if(aniFollow!=null)
+        {
+            JLabel stats = new JLabel(aniFollow.toString());
+            statistics.removeAll();
+            statistics.add(stats);
+            updateUI();
+        }
+    }
 
 
 }

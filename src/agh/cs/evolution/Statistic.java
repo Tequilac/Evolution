@@ -36,9 +36,18 @@ public class Statistic
             if(genes[i]>genes[domGene])
                 domGene=i;
         this.dominatingGene=domGene;
-        this.averageEnergy=(sumEne/animals.size());
-        this.averageAge=(sumAge/animals.size());
-        this.averageChildren=(sumChild/animals.size());
+        if(animals.size()>0)
+        {
+            this.averageEnergy=(sumEne/animals.size());
+            this.averageAge=(sumAge/animals.size());
+            this.averageChildren=(sumChild/animals.size());
+        }
+        else
+        {
+            this.averageEnergy=0;
+            this.averageAge=0;
+            this.averageChildren=0;
+        }
     }
     public void update (List<Animal> animals)
     {
@@ -63,13 +72,22 @@ public class Statistic
             if(genes[i]>genes[domGene])
                 domGene=i;
         this.dominatingGene=domGene;
-        this.averageEnergy=(sumEne/animals.size());
-        this.averageAge=(sumAge/animals.size());
-        this.averageChildren=(sumChild/animals.size());
+        if(animals.size()>0)
+        {
+            this.averageEnergy=(sumEne/animals.size());
+            this.averageAge=(sumAge/animals.size());
+            this.averageChildren=(sumChild/animals.size());
+        }
+        else
+        {
+            this.averageEnergy=0;
+            this.averageAge=0;
+            this.averageChildren=0;
+        }
     }
-    public void export (int aniCount, int graCount) throws FileNotFoundException {
+    public void export (int aniCount, int graCount, String qua) throws FileNotFoundException {
         StatisticParser parser = new StatisticParser();
-        parser.parse(aniCount, graCount,this.dominatingGene,this.averageEnergy,this.averageAge,this.averageChildren);
+        parser.parse(aniCount, graCount,this.dominatingGene,this.averageEnergy,this.averageAge,this.averageChildren, qua);
     }
 
 }

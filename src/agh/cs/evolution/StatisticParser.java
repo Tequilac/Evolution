@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 
 public class StatisticParser
 {
-    public void parse (int aniCount, int graCount, int domGene, double avgEne, double avgAge, double avgChild) throws FileNotFoundException {
+    public void parse (int aniCount, int graCount, int domGene, double avgEne, double avgAge, double avgChild, String qua) throws FileNotFoundException {
         JSONObject jo = new JSONObject();
         jo.put("Total number of animals", aniCount);
         jo.put("Total number of grasses", graCount);
@@ -18,11 +18,9 @@ public class StatisticParser
         jo.put("Average energy", avgEne);
         jo.put("Average age", avgAge);
         jo.put("Average number of children", avgChild);
-        PrintWriter pw = new PrintWriter("Statistic.json");
+        PrintWriter pw = new PrintWriter(qua+"MapStatistic.json");
         pw.write(jo.toJSONString());
         pw.flush();
         pw.close();
     }
-
-
 }

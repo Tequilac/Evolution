@@ -156,8 +156,6 @@ public class Panel extends JPanel
             statistics.removeAll();
             statistics.add(stats);
             updateUI();
-
-
         }
     }
 

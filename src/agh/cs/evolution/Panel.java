@@ -153,12 +153,10 @@ public class Panel extends JPanel
         if(aniFollow!=null)
         {
             stats = new JLabel(aniFollow.toString());
-            /*if(aniFollow.getEnergy()!=-1)
-            {*/
-                statistics.removeAll();
-                statistics.add(stats);
-                updateUI();
-            /*}*/
+            statistics.removeAll();
+            statistics.add(stats);
+            updateUI();
+
 
         }
     }

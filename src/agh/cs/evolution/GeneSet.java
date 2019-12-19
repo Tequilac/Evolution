@@ -58,4 +58,14 @@ public class GeneSet
     {
         return this.geneSet[(int) (Math.random()*32)];
     }
+
+    public boolean equals (GeneSet other)
+    {
+        boolean equality=true;
+        for(int i=0; i<32; i++)
+        {
+            equality=equality && (this.geneSet[i]==other.geneSet[i]);
+        }
+        return equality;
+    }
 }

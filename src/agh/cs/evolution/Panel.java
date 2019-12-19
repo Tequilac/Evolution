@@ -13,6 +13,10 @@ public class Panel extends JPanel
     JPanel world;
     JPanel statistics;
     Animal aniFollow;
+    JLabel stats;
+    List<Grass> gra;
+    List<Animal> ani;
+    List<Animal> deadAni;
     public Panel (Grassfield map, int wid, int hei)
     {
         this.map=map;
@@ -37,8 +41,9 @@ public class Panel extends JPanel
             }
 
         }
-        List<Grass> gra = map.grasses;
-        List<Animal> ani = map.animals;
+        gra = map.grasses;
+        ani = map.animals;
+
         for(Grass grass : gra)
         {
             int x = grass.getPosition().x;
@@ -54,7 +59,7 @@ public class Panel extends JPanel
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     aniFollow=animal;
-                    JLabel stats = new JLabel(aniFollow.toString());
+                    stats = new JLabel(aniFollow.toString());
                     statistics.removeAll();
                     statistics.add(stats);
                     updateUI();
@@ -66,19 +71,42 @@ public class Panel extends JPanel
     }
     public void refresh ()
     {
+        gra = map.grasses;
+        ani = map.animals;
+        deadAni = map.deadAnimals;
         for(int i=0; i<map.width; i++)
         {
             for(int j=0; j<map.height; j++)
             {
-                buttons[i][j].setBackground(new Color(242, 242, 177));
+
                 for( ActionListener al : buttons[i][j].getActionListeners() ) {
                     buttons[i][j].removeActionListener( al );
                 }
+                if(map.objectAt(new Vector2d(i,j))==null)
+                {
+                    buttons[i][j].setBackground(new Color(242, 242, 177));
+                    updateUI();
+                }
+
             }
+        }
+        for(Animal animal : deadAni)
+        {
+            int x = animal.getPosition().x;
+            int y = animal.getPosition().y;
+            buttons[x][y].setBackground(new Color(255, 255, 255));
+            buttons[x][y].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    aniFollow=animal;
+                    stats = new JLabel(aniFollow.toString());
+                    statistics.removeAll();
+                    statistics.add(stats);
+                    updateUI();
+                }
+            });
 
         }
-        List<Grass> gra = map.grasses;
-        List<Animal> ani = map.animals;
         for(Grass grass : gra)
         {
             int x = grass.getPosition().x;
@@ -94,16 +122,19 @@ public class Panel extends JPanel
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     aniFollow=animal;
-                    JLabel stats = new JLabel(aniFollow.toString());
+                    stats = new JLabel(aniFollow.toString());
                     statistics.removeAll();
                     statistics.add(stats);
                     updateUI();
                 }
             });
+
         }
+        updateUI();
         updateFollow();
 
     }
+
 
     public void highlight ()
     {
@@ -112,19 +143,23 @@ public class Panel extends JPanel
         {
             int x = animal.getPosition().x;
             int y = animal.getPosition().y;
-            buttons[x][y].setBackground(new Color(0,255,255));
+            if(animal.getGenes().equals(map.stats.dominantGenome))
+                buttons[x][y].setBackground(new Color(0,255,255));
 
         }
-        updateUI();
     }
     public void updateFollow ()
     {
         if(aniFollow!=null)
         {
-            JLabel stats = new JLabel(aniFollow.toString());
-            statistics.removeAll();
-            statistics.add(stats);
-            updateUI();
+            stats = new JLabel(aniFollow.toString());
+            /*if(aniFollow.getEnergy()!=-1)
+            {*/
+                statistics.removeAll();
+                statistics.add(stats);
+                updateUI();
+            /*}*/
+
         }
     }
 

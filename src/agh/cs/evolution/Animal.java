@@ -15,6 +15,7 @@ public class Animal
     private List <Animal> parents = new LinkedList<>();
     private int children=0;
     private int age=0;
+    private int deathDay;
     public List <Animal> descendants = new LinkedList<>();
 
     public Animal(IWorldMap map, long startEnergy)
@@ -41,6 +42,7 @@ public class Animal
         this.parents.add(parent2);
         parent2.children++;
         this.addDescendant(this.parents);
+        this.map.addGenome(this.genes);
 
     }
     public void addDescendant (List<Animal> parents)
@@ -63,7 +65,7 @@ public class Animal
         for(int i = 0; i<32; i++)
             info=info+this.genes.geneSet[i];
         if(this.energy==-1)
-            info=info+" Death day: "+this.age;
+            info=info+" Death day: "+this.deathDay;
         return info;
     }
     public void die ()
@@ -82,6 +84,10 @@ public class Animal
         this.energy=this.energy-moveEnergy;
         this.age++;
     }
+    public void setDeathDay(int day)
+    {
+        this.deathDay=day;
+    }
 
     public void eat (int energy)
     {
@@ -94,6 +100,7 @@ public class Animal
     }
     public int getEnergy() {return this.energy;}
     public int [] getGenes() {return this.genes.geneSet;}
+    public GeneSet getGeneSet() {return this.genes;}
     public int getChildren() {return this.children;}
     public int getAge() {return this.age;}
 

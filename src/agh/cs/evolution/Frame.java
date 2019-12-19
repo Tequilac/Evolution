@@ -104,19 +104,18 @@ public class Frame extends JFrame
     {
         panel = new JPanel();
         panel.setLayout(null);
-        panel.setPreferredSize(new Dimension(200, getHeight()));
         add(panel);
         JButton play = new JButton("Play");
         JButton stop = new JButton("Stop");
         JButton domGen = new JButton("Highlight dominant gene");
         JButton export = new JButton("Export statistics to JSON");
-        play.setBounds(0,0,200, 50);
+        play.setBounds(0,0,350, 50);
         panel.add(play);
-        stop.setBounds(0,50,200, 50);
+        stop.setBounds(0,50,350, 50);
         panel.add(stop);
-        domGen.setBounds(0,100,200, 50);
+        domGen.setBounds(0,100,350, 50);
         panel.add(domGen);
-        export.setBounds(0,150,200, 50);
+        export.setBounds(0,150,350, 50);
         panel.add(export);
         Frame frame=this;
 
@@ -164,23 +163,24 @@ public class Frame extends JFrame
 
     public void stat ()
     {
-        stats = new JLabel[maps.size()*7];
+        stats = new JLabel[maps.size()*8];
         int i=0;
         for(Grassfield map : maps)
         {
-            stats[i*7]=new JLabel(quantity[i]+"Map statistics:");
-            stats[1+i*7]=new JLabel("Animals: "+map.animals.size());
-            stats[2+i*7]=new JLabel("Grasses: "+map.grasses.size());
-            stats[3+i*7]=new JLabel("Average energy: "+map.stats.averageEnergy);
-            stats[4+i*7]=new JLabel("Dominant gene: "+map.stats.dominatingGene);
-            stats[5+i*7]=new JLabel("Average age: "+map.stats.averageAge);
-            stats[6+i*7]=new JLabel("Average number of children: "+map.stats.averageChildren);
+            stats[i*8]=new JLabel(quantity[i]+"Map statistics:");
+            stats[1+i*8]=new JLabel("Animals: "+map.animals.size());
+            stats[2+i*8]=new JLabel("Grasses: "+map.grasses.size());
+            stats[3+i*8]=new JLabel("Average energy: "+(double)(Math.round(map.stats.averageEnergy*100))/100);
+            stats[4+i*8]=new JLabel("Dominant gene: "+map.stats.getDominantGenome());
+            stats[5+i*8]=new JLabel("Average age: "+(double)(Math.round(map.stats.averageAge*100))/100);
+            stats[6+i*8]=new JLabel("Average dead age: "+(double)(Math.round(map.stats.averageDeadAge*100))/100);
+            stats[7+i*8]=new JLabel("Average number of children: "+(double)(Math.round(map.stats.averageChildren*100))/100);
             i++;
         }
-        for(int j=0; j<maps.size()*7; j++)
+        for(int j=0; j<maps.size()*8; j++)
         {
             panel.add(stats[j]);
-            stats[j].setBounds(0,200+j*20,200, 20);
+            stats[j].setBounds(0,200+j*20,350, 20);
         }
     }
 

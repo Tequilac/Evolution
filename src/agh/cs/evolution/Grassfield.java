@@ -9,9 +9,11 @@ import static java.lang.Integer.min;
 public class Grassfield implements IWorldMap, IPositionChangeObserver
 {
     protected List<Animal> animals = new ArrayList<>();
+    protected List<Animal> deadAnimals = new ArrayList<>();
     protected List<Grass> grasses = new ArrayList<>();
-    protected Map<Vector2d, Animal> all = new LinkedHashMap<>();
+    protected Map<Vector2d, Grass> allGrasses = new LinkedHashMap<>();
     protected MapBoundary mb = new MapBoundary();
+    protected int day;
     protected int width;
     protected int height;
     protected double jungleRatio;
@@ -24,6 +26,7 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
 
     public Grassfield(long width, long height, double jungleRatio, long moveEnergy, long plantEnergy, long startEnergy, int aniNum)
     {
+        this.day=0;
         this.width=(int)width;
         this.height=(int)height;
         this.jungleRatio=jungleRatio;
@@ -45,14 +48,14 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
         {
             placeGrass();
         }
-        this.stats=new Statistic(animals);
+        this.stats=new Statistic(animals, this.grasses.size());
 
     }
 
     public void placeGrass ()
     {
         int i = 0;
-        int tries = (int)(width*height*jungleRatio*jungleRatio*(0.75));
+        int tries = (int)(width*height*jungleRatio*(0.75));
         int x = (int)(Math.random() * (this.jungleUpperRight.x-this.jungleLowerLeft.x+1) + this.jungleLowerLeft.x);
         int y = (int)(Math.random() * (this.jungleUpperRight.y-this.jungleLowerLeft.y+1) + this.jungleLowerLeft.y);
         while(i<tries && isOccupied(new Vector2d(x,y)))
@@ -61,9 +64,13 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
             y = (int)(Math.random() * (this.jungleUpperRight.y-this.jungleLowerLeft.y+1) + this.jungleLowerLeft.y);
             i++;
         }
-        Grass grass = new Grass(new Vector2d(x, y));
-        grasses.add(grass);
-        mb.register(grass.getPosition());
+        if(!isOccupied(new Vector2d(x,y)))
+        {
+            Grass grass = new Grass(new Vector2d(x, y));
+            grasses.add(grass);
+            mb.register(grass.getPosition());
+            allGrasses.put(new Vector2d(x,y),grass);
+        }
         int xOut = (int)(Math.random() * (this.width));
         int yOut = (int)(Math.random() * (this.height));
         while(isOccupied(new Vector2d(xOut,yOut)) || (new Vector2d(xOut,yOut).follows(this.jungleLowerLeft) && new Vector2d(xOut,yOut).precedes(this.jungleUpperRight)))
@@ -74,30 +81,9 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
         Grass grassOut = new Grass(new Vector2d(xOut, yOut));
         grasses.add(grassOut);
         mb.register(grassOut.getPosition());
+        allGrasses.put(new Vector2d(xOut,yOut),grassOut);
     }
-    public String toString() {
-        MapVisualizer drawer = new MapVisualizer(this);
-        Vector2d lowerLeft;
-        Vector2d upperRight;
-        if(this.animals.size() == 0 && this.grasses.size() == 0)
-        {
-            return drawer.draw(new Vector2d(0,0), new Vector2d(0,0));
-        }
-        if(this.animals.size() != 0)
-        {
-            lowerLeft = (animals.get(0)).getPosition();
-            upperRight = (animals.get(0)).getPosition();
-        }
-        else
-        {
-            lowerLeft = (grasses.get(0)).getPosition();
-            upperRight = (grasses.get(0)).getPosition();
-        }
 
-        lowerLeft=new Vector2d(min(lowerLeft.x,mb.vectorsX.first().x),min(lowerLeft.y,mb.vectorsY.first().y));
-        upperRight=new Vector2d(max(upperRight.x,mb.vectorsX.last().x),max(upperRight.y,mb.vectorsY.last().y));
-        return drawer.draw(lowerLeft, upperRight);
-    }
 
     public void removeDead ()
     {
@@ -109,9 +95,13 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
             {
                 animal.die();
                 animals.remove(animal);
-                all.remove(animal);
                 animal.removeObserver(mb);
                 mb.deregister(animal.getPosition());
+                deadAnimals.add(animal);
+                animal.setDeathDay(this.day);
+                this.stats.deadAnimals++;
+                this.stats.removeGenome(animal.getGeneSet());
+                this.stats.sumDeadDays=this.stats.sumDeadDays+animal.getAge();
                 i--;
             }
         }
@@ -129,8 +119,6 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
 
     public boolean canMoveTo(Vector2d position)
     {
-        if(this.all.containsKey(position))
-            return false;
         return true;
     }
 
@@ -147,12 +135,16 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
         return new Vector2d(x,y);
     }
 
+    public void addGenome (GeneSet genome)
+    {
+        this.stats.addGenome(genome);
+    }
+
     public boolean place(Animal animal)
     {
         if((this.canMoveTo(animal.getPosition())))
         {
             animals.add(animal);
-            all.put(animal.getPosition(),animal);
             animal.addObserver(mb);
             mb.register(animal.getPosition());
             return true;
@@ -254,31 +246,54 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
         }
         grasses.remove(grass);
         mb.deregister(grass.getPosition());
+        allGrasses.remove(grass.getPosition(),grass);
     }
 
 
     public boolean isOccupied(Vector2d position)
     {
-        if(this.all.containsKey(position))
-            return true;
-        for (int i = 0; i < grasses.size(); i++)
+        for(Animal animal : animals)
         {
-            if(((grasses.get(i)).getPosition()).equals(position))
+            if(animal.getPosition().equals(position))
                 return true;
         }
+        if(this.allGrasses.containsKey(position))
+            return true;
         return false;
     }
 
     public Object objectAt(Vector2d position)
     {
-        return this.all.getOrDefault(position, null);
+        Object obj;
+        for(Animal animal : animals)
+        {
+            if(animal.getPosition().equals(position))
+            {
+                obj=animal;
+                return obj;
+            }
+        }
+            obj=this.allGrasses.getOrDefault(position,null);
+            if(obj!=null)
+                return obj;
+            else
+            {
+                for(Animal animal : deadAnimals)
+                {
+                    if(animal.getPosition().equals(position))
+                    {
+                        obj=animal;
+                        return obj;
+                    }
+                }
+            }
+        return null;
+
     }
 
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition)
     {
-        Animal ani = all.get(oldPosition);
-        all.remove(oldPosition, ani);
-        all.put(newPosition, ani);
+        return;
     }
 
     public Vector2d adjust (Vector2d pos)
@@ -289,6 +304,6 @@ public class Grassfield implements IWorldMap, IPositionChangeObserver
     }
 
     public void exportStats (String qua) throws FileNotFoundException {
-        this.stats.export(animals.size(),grasses.size(),qua);
+        this.stats.export(qua, day);
     }
 }

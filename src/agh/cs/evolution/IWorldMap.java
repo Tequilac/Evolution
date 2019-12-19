@@ -59,4 +59,6 @@ public interface IWorldMap {
     public Vector2d findNewPlace();
 
     void removeDead ();
+
+    void addGenome(GeneSet genome);
 }

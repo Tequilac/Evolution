@@ -2,7 +2,6 @@ package agh.cs.evolution;
 
 
 
-import java.sql.Array;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;

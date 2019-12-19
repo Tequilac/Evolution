@@ -5,7 +5,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -41,7 +40,8 @@ public class Evolution
             map.run();
             map.searchForReproduceAndEating();
             map.placeGrass();
-            map.stats.update(map.animals);
+            map.stats.update(map.animals, map.grasses.size());
+            map.day++;
     }
 
 

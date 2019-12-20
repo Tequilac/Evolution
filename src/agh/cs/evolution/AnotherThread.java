@@ -23,7 +23,7 @@ public class AnotherThread extends Thread
                     panel.refresh();
                 }
                 frame.stat();
-                Thread.sleep(100);
+                Thread.sleep(50);
             }
         }
         catch (InterruptedException e) {}

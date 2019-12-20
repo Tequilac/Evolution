@@ -10,16 +10,13 @@ import java.util.TreeSet;
 public class MapBoundary implements IPositionChangeObserver
 {
     public SortedSet<Vector2d> vectorsX = new TreeSet<Vector2d>(new ComparatorX());
-    public SortedSet<Vector2d> vectorsY = new TreeSet<Vector2d>(new ComparatorY());
     public void addVector (Vector2d vector)
     {
         vectorsX.add(vector);
-        vectorsY.add(vector);
     }
     public void removeVector (Vector2d vector)
     {
         vectorsX.remove(vector);
-        vectorsY.remove(vector);
     }
     public void positionChanged (Vector2d oldPosition, Vector2d newPosition)
     {

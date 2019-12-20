@@ -150,7 +150,7 @@ public class Panel extends JPanel
     }
     public void updateFollow ()
     {
-        if(aniFollow!=null)
+        if(aniFollow!=null && !aniFollow.toString().equals(stats.getText()))
         {
             stats = new JLabel(aniFollow.toString());
             statistics.removeAll();
